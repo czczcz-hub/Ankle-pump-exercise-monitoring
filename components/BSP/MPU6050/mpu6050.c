@@ -33,7 +33,8 @@ esp_err_t mpu6050_init(void)
     esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_PORT, cmd, pdMS_TO_TICKS(1000));
     i2c_cmd_link_delete(cmd);
 
-    if (ret != ESP_OK || who_am_i != 0x68) {
+    if (ret != ESP_OK || who_am_i != 0x68) 
+    {
         ESP_LOGE(TAG, "MPU6050 not found (WHO_AM_I=0x%02x, err=%d)", who_am_i, ret);
         return ESP_FAIL;
     }
@@ -94,7 +95,8 @@ esp_err_t mpu6050_read(mpu6050_data_t *data)
     esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_PORT, cmd, pdMS_TO_TICKS(100));
     i2c_cmd_link_delete(cmd);
 
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         return ret;
     }
 

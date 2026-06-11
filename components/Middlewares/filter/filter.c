@@ -8,16 +8,19 @@ void moving_avg_init(moving_avg_t *f, float *buf, uint8_t size)
     f->index = 0;
     f->count = 0;
     f->sum = 0.0f;
-    for (uint8_t i = 0; i < size; i++) {
+    for (uint8_t i = 0; i < size; i++) 
+    {
         buf[i] = 0.0f;
     }
 }
 
 float moving_avg_update(moving_avg_t *f, float val)
 {
-    if (f->count < f->size) {
+    if (f->count < f->size) 
+    {
         f->count++;
-    } else {
+    } else 
+    {
         f->sum -= f->buffer[f->index];
     }
     f->buffer[f->index] = val;

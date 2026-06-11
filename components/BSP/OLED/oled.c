@@ -188,7 +188,8 @@ void oled_clear(void)
 
     uint8_t zero[OLED_WIDTH];
     memset(zero, 0, OLED_WIDTH);
-    for (int i = 0; i < OLED_PAGES; i++) {
+    for (int i = 0; i < OLED_PAGES; i++) 
+    {
         oled_write_data(zero, OLED_WIDTH);
     }
 }
@@ -221,17 +222,21 @@ void oled_show_text_xy(uint8_t x, uint8_t page, const char *text)
 
     uint8_t buf[OLED_WIDTH];
     size_t buf_idx = 0;
-    while (*text && buf_idx + 6 <= OLED_WIDTH - x) {
+    while (*text && buf_idx + 6 <= OLED_WIDTH - x) 
+    {
         uint8_t ch = (uint8_t)*text;
         if (ch < 32 || ch > 126) ch = 32;
         const uint8_t *glyph = font6x8[ch - 32];
-        for (int i = 0; i < 6; i++) {
+
+        for (int i = 0; i < 6; i++) 
+        {
             buf[buf_idx++] = glyph[i];
         }
         text++;
     }
     // 用空格填充剩余
-    while (buf_idx < OLED_WIDTH) {
+    while (buf_idx < OLED_WIDTH) 
+    {
         buf[buf_idx++] = 0;
     }
     oled_write_data(buf, OLED_WIDTH);

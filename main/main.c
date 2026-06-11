@@ -29,11 +29,15 @@ static void sensor_task(void *pvParameters)
 
     TickType_t last_wake = xTaskGetTickCount();
 
-    while (1) {
-        if (xSemaphoreTake(g_state.i2c_mutex, pdMS_TO_TICKS(5)) == pdTRUE) {
+    while (1) 
+    {
+        if (xSemaphoreTake(g_state.i2c_mutex, pdMS_TO_TICKS(5)) == pdTRUE) 
+        {
             mpu6050_read(&data);
             xSemaphoreGive(g_state.i2c_mutex);
-        } else {
+        } 
+        else 
+        {
             vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(10));
             continue;
         }
@@ -46,16 +50,21 @@ static void sensor_task(void *pvParameters)
         movement_zone_t new_zone = ZONE_IDLE;
         bool event_occurred = false;
 
-        if (angle > DORSI_THRESHOLD) {
+        if (angle > DORSI_THRESHOLD) 
+        {
             new_zone = ZONE_DORSIFLEX;
-            if (zone != ZONE_DORSIFLEX) {
+            if (zone != ZONE_DORSIFLEX) 
+            {
                 count_dorsi++;
                 event_occurred = true;
                 printf("Dorsiflex #%lu (angle=%.1f)\n", count_dorsi, angle);
             }
-        } else if (angle < -PLANTAR_THRESHOLD) {
+        } 
+        else if (angle < -PLANTAR_THRESHOLD) 
+        {
             new_zone = ZONE_PLANTARFLEX;
-            if (zone != ZONE_PLANTARFLEX) {
+            if (zone != ZONE_PLANTARFLEX) 
+            {
                 count_plantar++;
                 event_occurred = true;
                 printf("Plantarflex #%lu (angle=%.1f)\n", count_plantar, angle);
@@ -75,7 +84,8 @@ static void sensor_task(void *pvParameters)
         g_state.count_dorsi   = count_dorsi;
         g_state.count_plantar = count_plantar;
 
-        if (event_occurred) {
+        if (event_occurred) 
+        {
             g_state.ble_event.angle        = angle;
             g_state.ble_event.zone         = zone;
             g_state.ble_event.count_dorsi  = count_dorsi;
@@ -84,7 +94,8 @@ static void sensor_task(void *pvParameters)
         }
         xSemaphoreGive(g_state.mutex);
 
-        if (event_occurred) {
+        if (event_occurred) 
+        {
             xSemaphoreGive(g_state.ble_sem);
         }
 
@@ -98,12 +109,14 @@ static void display_task(void *pvParameters)
     TickType_t last_wake = xTaskGetTickCount();
     uint32_t loop = 0;
 
-    while (1) {
+    while (1) 
+    {
         float    angle; float gx, gy, gz;
         uint32_t cd, cp;
         int8_t   zone;
 
-        if (xSemaphoreTake(g_state.mutex, pdMS_TO_TICKS(20)) != pdTRUE) {
+        if (xSemaphoreTake(g_state.mutex, pdMS_TO_TICKS(20)) != pdTRUE) 
+        {
             vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(100));
             continue;
         }
@@ -119,7 +132,8 @@ static void display_task(void *pvParameters)
         const char *status = (zone == ZONE_DORSIFLEX)  ? "Dorsiflex" :
                              (zone == ZONE_PLANTARFLEX) ? "Plantarflex" : "Idle";
 
-        if (xSemaphoreTake(g_state.i2c_mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        if (xSemaphoreTake(g_state.i2c_mutex, pdMS_TO_TICKS(50)) == pdTRUE) 
+        {
             char line[32];
             snprintf(line, sizeof(line), "Angle: %.1f", angle);
             oled_show_text(2, line);
@@ -131,7 +145,9 @@ static void display_task(void *pvParameters)
             oled_show_text(5, line);
             xSemaphoreGive(g_state.i2c_mutex);
             if (loop % 50 == 0) printf("[DISP] loop=%lu ok\n", loop);
-        } else {
+        } 
+        else 
+        {
             if (loop % 10 == 0) printf("[DISP] i2c timeout loop=%lu\n", loop);
         }
 
@@ -144,7 +160,8 @@ static void ble_notify_task(void *pvParameters)
 {
     TickType_t last_wake = xTaskGetTickCount();
 
-    while (1) {
+    while (1) 
+    {
         float    angle, gx, gy, gz, ax, ay, az;
         int8_t   zone;
         uint32_t cd, cp;
@@ -180,7 +197,8 @@ static void ble_notify_task(void *pvParameters)
         cJSON_AddNumberToObject(root, "cnt_p", cp);
 
         char *json_str = cJSON_PrintUnformatted(root);
-        if (json_str) {
+        if (json_str) 
+        {
             ble_notify_movement(json_str, strlen(json_str));
             cJSON_free(json_str);
         }
@@ -193,19 +211,22 @@ static void ble_notify_task(void *pvParameters)
 void app_main(void)
 {
     esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) 
+    {
         nvs_flash_erase();
         nvs_flash_init();
     }
 
     shared_state_init();
 
-    if (mpu6050_init() != ESP_OK) {
+    if (mpu6050_init() != ESP_OK) 
+    {
         printf("MPU6050 init failed, check wiring.\n");
         return;
     }
 
-    if (oled_init() != ESP_OK) {
+    if (oled_init() != ESP_OK) 
+    {
         printf("OLED init failed, check wiring.\n");
         return;
     }

@@ -93,7 +93,8 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
     switch (event) {
 
     case ESP_GATTS_REG_EVT:
-        if (param->reg.status == ESP_GATT_OK) {
+        if (param->reg.status == ESP_GATT_OK) 
+        {
             gatts_if = evt_gatts_if;
             ESP_LOGI(TAG, "REG_EVT ok, creating service");
             esp_gatt_srvc_id_t srvc_id;
@@ -101,13 +102,16 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
             srvc_id.id.inst_id = 0;
             srvc_id.id.uuid = svc_uuid;
             esp_ble_gatts_create_service(gatts_if, &srvc_id, SVC_NUM_HANDLES);
-        } else {
+        } 
+        else 
+        {
             ESP_LOGE(TAG, "REG_EVT failed: %d", param->reg.status);
         }
         break;
 
     case ESP_GATTS_CREATE_EVT:
-        if (param->create.status == ESP_GATT_OK) {
+        if (param->create.status == ESP_GATT_OK) 
+        {
             svc_handle = param->create.service_handle;
             ESP_LOGI(TAG, "CREATE_EVT ok, handle=%d", svc_handle);
 
@@ -123,13 +127,16 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
                 &char_val, NULL);
 
             esp_ble_gatts_start_service(svc_handle);
-        } else {
+        } 
+        else 
+        {
             ESP_LOGE(TAG, "CREATE_EVT failed: %d", param->create.status);
         }
         break;
 
     case ESP_GATTS_ADD_CHAR_EVT:
-        if (param->add_char.status == ESP_GATT_OK) {
+        if (param->add_char.status == ESP_GATT_OK) 
+        {
             chr_handle = param->add_char.attr_handle;
             ESP_LOGI(TAG, "ADD_CHAR_EVT ok, handle=%d", chr_handle);
 
@@ -147,20 +154,24 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
                 &cccd_uuid,
                 ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
                 &cccd_val, NULL);
-        } else {
+        } 
+        else 
+        {
             ESP_LOGE(TAG, "ADD_CHAR_EVT failed: %d", param->add_char.status);
         }
         break;
 
     case ESP_GATTS_ADD_CHAR_DESCR_EVT:
-        if (param->add_char_descr.status == ESP_GATT_OK) {
+        if (param->add_char_descr.status == ESP_GATT_OK) 
+        {
             cccd_handle = param->add_char_descr.attr_handle;
             ESP_LOGI(TAG, "CCCD descriptor added, handle=%d", cccd_handle);
         }
         break;
 
     case ESP_GATTS_START_EVT:
-        if (param->start.status == ESP_GATT_OK) {
+        if (param->start.status == ESP_GATT_OK) 
+        {
             ESP_LOGI(TAG, "START_EVT ok, setting adv data");
             set_adv_data();
         }
@@ -185,14 +196,16 @@ static void gatts_event_handler(esp_gatts_cb_event_t event,
         break;
 
     case ESP_GATTS_WRITE_EVT:
-        if (param->write.handle == cccd_handle && param->write.len == 2) {
+        if (param->write.handle == cccd_handle && param->write.len == 2) 
+        {
             uint16_t val = param->write.value[0]
                          | (param->write.value[1] << 8);
             notify_enabled = ((val & 0x0001) != 0);
             ESP_LOGI(TAG, "CCCD written: 0x%04x, notify %s",
                      val, notify_enabled ? "enabled" : "disabled");
         }
-        if (param->write.need_rsp) {
+        if (param->write.need_rsp) 
+        {
             esp_ble_gatts_send_response(evt_gatts_if,
                 param->write.conn_id, param->write.trans_id,
                 ESP_GATT_OK, NULL);
@@ -216,13 +229,15 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event,
     switch (event) {
 
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
-        if (param->adv_data_cmpl.status == ESP_BT_STATUS_SUCCESS) {
+        if (param->adv_data_cmpl.status == ESP_BT_STATUS_SUCCESS) 
+        {
             start_advertising();
         }
         break;
 
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
-        if (param->adv_start_cmpl.status == ESP_BT_STATUS_SUCCESS) {
+        if (param->adv_start_cmpl.status == ESP_BT_STATUS_SUCCESS) 
+        {
             ESP_LOGI(TAG, "Advertising as '%s'", DEVICE_NAME);
         }
         break;
@@ -241,25 +256,29 @@ void ble_service_init(void)
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     bt_cfg.sleep_mode = ESP_BT_SLEEP_MODE_NONE;  /* prevent missing conn events */
     ret = esp_bt_controller_init(&bt_cfg);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "bt_controller_init failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "bt_controller_enable failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bluedroid_init();
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "bluedroid_init failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_bluedroid_enable();
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "bluedroid_enable failed: %s", esp_err_to_name(ret));
         return;
     }
@@ -270,24 +289,31 @@ void ble_service_init(void)
     nvs_handle_t nvs_h;
     bool addr_from_nvs = false;
 
-    if (nvs_open("ble_config", NVS_READWRITE, &nvs_h) == ESP_OK) {
+    if (nvs_open("ble_config", NVS_READWRITE, &nvs_h) == ESP_OK) 
+    {
         size_t len = sizeof(rand_addr);
-        if (nvs_get_blob(nvs_h, "rand_addr", rand_addr, &len) == ESP_OK && len == 6) {
+        if (nvs_get_blob(nvs_h, "rand_addr", rand_addr, &len) == ESP_OK && len == 6) 
+        {
             addr_from_nvs = true;
-        } else {
+        } 
+        else 
+        {
             esp_fill_random(rand_addr, 6);
             rand_addr[0] |= 0xC0;  /* top two bits = 11 → static random address */
             nvs_set_blob(nvs_h, "rand_addr", rand_addr, 6);
             nvs_commit(nvs_h);
         }
         nvs_close(nvs_h);
-    } else {
+    } 
+    else
+    {
         esp_fill_random(rand_addr, 6);
         rand_addr[0] |= 0xC0;
     }
 
     ret = esp_ble_gap_set_rand_addr(rand_addr);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "set_rand_addr failed: %s", esp_err_to_name(ret));
         return;
     }
@@ -303,25 +329,29 @@ void ble_service_init(void)
     esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(iocap));
 
     ret = esp_ble_gatts_register_callback(gatts_event_handler);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK)
+    {
         ESP_LOGE(TAG, "gatts_register_callback failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_ble_gap_register_callback(gap_event_handler);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "gap_register_callback failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_ble_gap_set_device_name(DEVICE_NAME);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "gap_set_device_name failed: %s", esp_err_to_name(ret));
         return;
     }
 
     ret = esp_ble_gatts_app_register(PROFILE_APP_ID);
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "gatts_app_register failed: %s", esp_err_to_name(ret));
         return;
     }
@@ -331,7 +361,8 @@ void ble_service_init(void)
 
 void ble_notify_movement(const char *json_str, size_t len)
 {
-    if (!is_connected || !notify_enabled) {
+    if (!is_connected || !notify_enabled) 
+    {
         return;
     }
 
@@ -339,7 +370,8 @@ void ble_notify_movement(const char *json_str, size_t len)
         gatts_if, conn_id, chr_handle,
         len, (uint8_t *)json_str, false);
 
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK) 
+    {
         ESP_LOGE(TAG, "send_indicate failed: %s (len=%d)",
                  esp_err_to_name(ret), (int)len);
     }
