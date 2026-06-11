@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Espressif/frameworks/esp-idf-v5.4/tools/**)",
+      "Read(//d/Espressif/python_env/**)",
+      "Read(//d/Espressif/tools/**)",
+      "Bash(powershell.exe -NoProfile -Command \"& 'D:\\\\Espressif\\\\frameworks\\\\esp-idf-v5.4\\\\export.ps1'; cd 'c:\\\\Users\\\\86136\\\\Desktop\\\\ESP32\\\\Project1\\\\Ankle-pump-exercise-monitoring-main'; idf.py build 2>&1\")",
+      "Read(//c/Windows/System32/WindowsPowerShell/v1.0/**)",
+      "Read(//c/Windows/System32/**)",
+      "Bash(grep -n \"ble_store_ram_find_sec\" \"D:/Espressif/frameworks/esp-idf-v5.4/components/bt/host/nimble/nimble/nimble/host/store/ram/src/ble_store_ram.c\" 2>/dev/null)",
+      "Bash(grep -n \"ble_store_config_find_sec\" \"D:/Espressif/frameworks/esp-idf-v5.4/components/bt/host/nimble/nimble/nimble/host/store/config/src/ble_store_config.c\" 2>/dev/null)",
+      "Bash(ls -la \"C:/Users/86136/Desktop/ESP32/miniprogram-2/\")"
+    ]
+  }
+}
